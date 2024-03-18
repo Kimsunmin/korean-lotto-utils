@@ -1,6 +1,7 @@
 import { decode } from 'iconv-lite';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { LottoResultOrigin, parseLottoResultOrigin } from './lotto.interface';
 
 const LOTTO_BASE_URL = 'https://dhlottery.co.kr/gameResult.do';
 
@@ -27,28 +28,104 @@ const getCurrentDrawRound = async (): Promise<number> => {
   return currentDrawRound;
 };
 
+type RoundRangeType = { start: number; end: number };
+type RoundType = number | RoundRangeType | 'ALL' | 'CURRENT';
 interface resultOption {
-  round?: number;
-  range?: { start: number; end: number };
-  currentResult?: boolean;
+  round?: RoundType;
 }
+
+const roundToDrawRoundByRoundType = async (
+  round: RoundType,
+): Promise<{ drwNoStart: number; drwNoEnd: number } | undefined> => {
+  const roundType = typeof round;
+
+  if (roundType === 'number') {
+    return {
+      drwNoStart: round as number,
+      drwNoEnd: round as number,
+    };
+  }
+
+  if (roundType === 'object') {
+    const { start, end } = round as RoundRangeType;
+    return {
+      drwNoStart: start,
+      drwNoEnd: end,
+    };
+  }
+
+  if (roundType === 'string' && round === 'ALL') {
+    return {
+      drwNoStart: 1,
+      drwNoEnd: await getCurrentDrawRound(),
+    };
+  }
+
+  if (roundType === 'string' && round === 'CURRENT') {
+    const currentDrawRound = await getCurrentDrawRound();
+    return {
+      drwNoStart: currentDrawRound,
+      drwNoEnd: currentDrawRound,
+    };
+  }
+
+  return undefined;
+};
 
 const getLottoResult = async (option: resultOption) => {
   const baseUrl = LOTTO_BASE_URL;
+  const { round } = option;
+
+  if (!round) {
+    throw new Error('round is empty');
+  }
+
+  const roundRange = await roundToDrawRoundByRoundType(round);
   const params = {
     method: 'allWinExel',
     gubun: 'byWin',
+    ...roundRange,
   };
 
-  const {round, range, currentResult} = option;
+  const response = await axios.get(baseUrl, {
+    params,
+    url: 'gameResult.do',
+    responseType: 'arraybuffer',
+    responseEncoding: 'binary',
+  });
 
-  if ( range?.start && range?.end ) {
-    if (range.start > range.end) {
-      throw new Error(`start:${range.start} must not be greater than end:${range.end}`);
+  const htmlString = decode(Buffer.concat([response.data]), 'euc-kr');
+  const html = cheerio.load(htmlString);
+
+  const lottoResults: LottoResultOrigin[] = [];
+  const tr = html('tr');
+  tr.each((i, el) => {
+    if (i <= 2) {
+      return;
     }
 
-    params['drwStartNo'] = range.start;
-    params['drwEndNo'] = range.end;
-  }
+    const firstChildren = html(el).children('td').first().attr();
+    if (firstChildren?.rowspan) {
+      html(el).children('td').first().remove();
+    }
 
+    const drawResult: string[] = [];
+    html(el)
+      .children('td')
+      .each((i, el) => {
+        const value = html(el)
+          .text()
+          .replace(new RegExp(',|�|[가-힣]', 'g'), '');
+
+        drawResult.push(value);
+      });
+    lottoResults.push(parseLottoResultOrigin(drawResult));
+  });
+
+  return lottoResults;
 };
+
+const run = async () => {
+  console.log(await getLottoResult({ round: 'CURRENT' }));
+};
+run();
