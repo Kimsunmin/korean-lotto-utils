@@ -44,15 +44,67 @@ export const parseLottoResultOrigin = (data: string[]): LottoResultOrigin => {
   };
 };
 
+export interface Result {
+  rank: number;
+  wins: number;
+  amount: number;
+  totalAmount: number;
+}
+
 export interface LottoResult {
-  round: string;
+  round: number;
   date: string;
   numbers: number[];
   bonus: number;
-  results: {
-    rank: number;
-    wins: number;
-    amount: number;
-    totalAmount: number;
-  };
+  results: Result[];
 }
+
+export const parseLottoResultToOrigin = (
+  origin: LottoResultOrigin,
+): LottoResult => {
+  return {
+    round: origin.drwNo,
+    date: origin.drwNoDate,
+    numbers: [
+      origin.drwtNo1,
+      origin.drwtNo2,
+      origin.drwtNo3,
+      origin.drwtNo4,
+      origin.drwtNo5,
+      origin.drwtNo6,
+    ],
+    bonus: origin.bnusNo,
+    results: [
+      {
+        rank: 1,
+        wins: origin.winnerRank1,
+        amount: origin.winPayRank1,
+        totalAmount: origin.winPayRank1 * origin.winnerRank1,
+      },
+      {
+        rank: 2,
+        wins: origin.winnerRank2,
+        amount: origin.winPayRank2,
+        totalAmount: origin.winPayRank2 * origin.winnerRank2,
+      },
+      {
+        rank: 3,
+        wins: origin.winnerRank3,
+        amount: origin.winPayRank3,
+        totalAmount: origin.winPayRank3 * origin.winnerRank3,
+      },
+      {
+        rank: 4,
+        wins: origin.winnerRank4,
+        amount: origin.winPayRank4,
+        totalAmount: origin.winPayRank4 * origin.winnerRank4,
+      },
+      {
+        rank: 5,
+        wins: origin.winnerRank5,
+        amount: origin.winPayRank5,
+        totalAmount: origin.winPayRank5 * origin.winnerRank5,
+      },
+    ],
+  };
+};

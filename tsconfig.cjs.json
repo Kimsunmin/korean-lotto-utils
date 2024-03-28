@@ -7,6 +7,6 @@
     "moduleResolution": "Node",
     "outDir": "lib/cjs",
     "declaration": true,
-    "declarationDir": "lib/cjs/types/index.d.ts",
+    "declarationDir": "lib/cjs/types",
   }
 }

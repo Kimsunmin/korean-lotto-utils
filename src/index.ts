@@ -1,8 +1,2 @@
-// 최근 로또 회차 불러오기
-/**
- * 로또 정보 불러오기
- * 1. start ~ end 불러오기
- * 2. 지정된 1개 회차 데이터 불러오기
- * 3. 가장 최근 데이터 부터 불러오기
- */
-
+export * from './result';
+export * from './lotto.interface';

@@ -2,25 +2,31 @@
   "name": "@kimsunmin/korean-lotto-utils",
   "version": "1.0.0",
   "description": "korean lotto utils",
-  "main": "./lib/cjs/index.ts",
-  "types": "./lib/cjs/types/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/types/index.d.ts",
   "files": [
     "lib/**/*"
   ],
+  "author": "kimsunmin",
+  "license": "MIT",
+  "keywords": ["lotto", "korean-lotto"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ts-node test.ts",
     "start:result": "ts-node src/result.ts",
-    "clean": "rm -rf ./lib",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build": "rm ./lib && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc -p ./tsconfig.esm.json && mv lib/esm/index.js lib/esm/index.mjs",
     "build:cjs": "tsc -p ./tsconfig.cjs.json",
+    "build:win": "rmdir /s lib && npm run build:esm:win && npm run build:cjs",
+    "build:esm:win": "tsc -p ./tsconfig.esm.json",
+    "build:esm:win2": "tsc -p ./tsconfig.esm.json && move .\\lib\\esm\\index.js .\\lib\\esm\\index.mjs",
     "prepack": "npm run build"
   },
   "exports": {
     ".": {
       "import": {
         "types": "./lib/esm/types/index.d.ts",
-        "default": "./lib/esm/index.mjs"
+        "default": "./lib/esm/index.js"
       },
       "require": {
         "types": "./lib/cjs/types/index.d.ts",
@@ -32,8 +38,6 @@
     "type": "git",
     "url": "git+https://github.com/Kimsunmin/korean-lotto-utils.git"
   },
-  "author": "kimsunmin",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Kimsunmin/korean-lotto-utils/issues"
   },

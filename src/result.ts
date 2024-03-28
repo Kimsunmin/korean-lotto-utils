@@ -1,11 +1,16 @@
 import { decode } from 'iconv-lite';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { LottoResultOrigin, parseLottoResultOrigin } from './lotto.interface';
+import {
+  LottoResult,
+  LottoResultOrigin,
+  parseLottoResultOrigin,
+  parseLottoResultToOrigin,
+} from './lotto.interface';
 
 const LOTTO_BASE_URL = 'https://dhlottery.co.kr/gameResult.do';
 
-const getCurrentDrawRound = async (): Promise<number> => {
+export const getCurrentDrawRound = async (): Promise<number> => {
   const baseUrl = LOTTO_BASE_URL;
   const params = {
     method: 'byWin',
@@ -28,9 +33,9 @@ const getCurrentDrawRound = async (): Promise<number> => {
   return currentDrawRound;
 };
 
-type RoundRangeType = { start: number; end: number };
-type RoundType = number | RoundRangeType | 'ALL' | 'CURRENT';
-interface resultOption {
+export type RoundRangeType = { start: number; end: number };
+export type RoundType = number | RoundRangeType | 'ALL' | 'CURRENT';
+export interface ResultOption {
   round?: RoundType;
 }
 
@@ -72,7 +77,9 @@ const roundToDrawRoundByRoundType = async (
   return undefined;
 };
 
-const getLottoResult = async (option: resultOption) => {
+export const getLottoResult = async (
+  option: ResultOption,
+): Promise<LottoResult[]> => {
   const baseUrl = LOTTO_BASE_URL;
   const { round } = option;
 
@@ -97,7 +104,7 @@ const getLottoResult = async (option: resultOption) => {
   const htmlString = decode(Buffer.concat([response.data]), 'euc-kr');
   const html = cheerio.load(htmlString);
 
-  const lottoResults: LottoResultOrigin[] = [];
+  const lottoResultsOrigin: LottoResultOrigin[] = [];
   const tr = html('tr');
   tr.each((i, el) => {
     if (i <= 2) {
@@ -119,13 +126,11 @@ const getLottoResult = async (option: resultOption) => {
 
         drawResult.push(value);
       });
-    lottoResults.push(parseLottoResultOrigin(drawResult));
+    lottoResultsOrigin.push(parseLottoResultOrigin(drawResult));
   });
 
+  const lottoResults = lottoResultsOrigin.map((origin) =>
+    parseLottoResultToOrigin(origin),
+  );
   return lottoResults;
 };
-
-const run = async () => {
-  console.log(await getLottoResult({ round: 'CURRENT' }));
-};
-run();
