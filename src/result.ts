@@ -117,6 +117,7 @@ export const getLottoResult = async (
     }
 
     const drawResult: string[] = [];
+    // TODO: Add cheerio type
     html(el)
       .children('td')
       .each((i, el) => {
