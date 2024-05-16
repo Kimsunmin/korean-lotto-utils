@@ -1,5 +1,5 @@
 {
-  "name": "@kimsunmin/korean-lotto-utils",
+  "name": "@sunmin0406/korean-lotto-utils",
   "version": "1.0.0",
   "description": "korean lotto utils",
   "main": "./dist/index.js",
@@ -8,7 +8,7 @@
   "files": [
     "dist"
   ],
-  "author": "kimsunmin",
+  "author": "sunmin0406",
   "license": "MIT",
   "keywords": [
     "lotto",
