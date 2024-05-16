@@ -11,7 +11,8 @@
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "NodeNext",
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "noImplicitAny": false
   },
-  "files": ["./src/index.ts"],
+  "files": ["./src/index.ts"]
 }

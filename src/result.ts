@@ -10,6 +10,10 @@ import {
 
 const LOTTO_BASE_URL = 'https://dhlottery.co.kr/gameResult.do';
 
+/**
+ * 현재 추첨 결과가 존재하는 추첨 회차를 조회
+ * @returns - CurrentDrawRound: number
+ */
 export const getCurrentDrawRound = async (): Promise<number> => {
   const baseUrl = LOTTO_BASE_URL;
   const params = {
@@ -117,10 +121,9 @@ export const getLottoResult = async (
     }
 
     const drawResult: string[] = [];
-    // TODO: Add cheerio type
     html(el)
       .children('td')
-      .each((i, el) => {
+      .each((_, el) => {
         const value = html(el)
           .text()
           .replace(new RegExp(',|�|[가-힣]', 'g'), '');
@@ -130,7 +133,7 @@ export const getLottoResult = async (
     lottoResultsOrigin.push(parseLottoResultOrigin(drawResult));
   });
 
-  const lottoResults = lottoResultsOrigin.map((origin) =>
+  const lottoResults = lottoResultsOrigin.map((origin: LottoResultOrigin) =>
     parseLottoResultToOrigin(origin),
   );
   return lottoResults;

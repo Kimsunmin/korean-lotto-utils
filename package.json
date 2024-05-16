@@ -15,16 +15,7 @@
     "korean-lotto"
   ],
   "scripts": {
-    "test": "ts-node src/test.ts",
-    "start:result": "ts-node src/result.ts",
-    "build": "rm ./lib && npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc -p ./tsconfig.esm.json && mv lib/esm/index.js lib/esm/index.mjs",
-    "build:cjs": "tsc -p ./tsconfig.cjs.json",
-    "build:win": "rmdir /s lib && npm run build:esm:win && npm run build:cjs",
-    "build:esm:win": "tsc -p ./tsconfig.esm.json",
-    "build:esm:win2": "tsc -p ./tsconfig.esm.json && move .\\lib\\esm\\index.js .\\lib\\esm\\index.mjs",
-    "build:tsup": "tsup",
-    "prepack": "npm run build"
+    "build": "tsup"
   },
   "repository": {
     "type": "git",
